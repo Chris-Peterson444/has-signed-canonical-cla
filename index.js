@@ -111,22 +111,44 @@ async function run() {
       continue
     }
 
+    console.log('Check in the signed list service');
+
     try {
-      console.log('Check in the signed list service');
       const response = await axios.get(
         'https://cla-checker.canonical.com/check_user/' + username
       );
       if (response.status === 200) {
         console.log('- ' + username + ' ✓ (has signed the CLA)');
         commit_authors[i]['signed'] = true;
+        continue
       }
     } catch (error) {
       if (error.response && error.response.status === 404) {
-        console.log('- ' + username + ' ✕ (has not signed the CLA)');
+        console.log('- ' + username + ' not found. Trying lowercase variant...');
       } else {
         console.error('Error occurred while checking user:', error.message);
       }
     }
+
+    try {
+      console.log('Check in the signed list service');
+      const lowercase_name = username.toLowerCase()
+      const response = await axios.get(
+        'https://cla-checker.canonical.com/check_user/' + lowercase_name
+      );
+      if (response.status === 200) {
+        console.log('- ' + lowercase_name + ' ✓ (has signed the CLA)');
+        commit_authors[i]['signed'] = true;
+        continue
+      }
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        console.log('- ' + lowercase_name + ' ✕ (has not signed the CLA)');
+      } else {
+        console.error('Error occurred while checking user:', error.message);
+      }
+    }
+
   }
 
   console.log();
