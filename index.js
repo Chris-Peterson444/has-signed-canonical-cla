@@ -176,6 +176,7 @@ async function run() {
   const repoFullName = github.context.payload.repository.full_name;
   const repoInLicenseMap = repoFullName in licenseMap;
   var commitAuthors = {};
+  console.log(commits.data)
   for (const commitObj of commits.data) {
     // Check if the commit message contains a license header that matches
     // one of the licenses granting implicit CLA approval
@@ -197,6 +198,7 @@ async function run() {
       username: username,
       signed: false
     };
+    console.log("checking %s - %s", email, username);
   }
 
   processCLAExceptions(commitAuthors);
